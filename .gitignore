@@ -1,0 +1,45 @@
+# ==========================================
+# Compiled Binaries & Object Files
+# ==========================================
+*.o
+*.obj
+*.exe
+*.out
+*.app
+*.elf
+*.hex
+*.bin
+
+# ==========================================
+# Build Output Directories
+# ==========================================
+build/
+bin/
+out/
+Debug/
+Release/
+
+# ==========================================
+# IDE & Editor Specific Files
+# ==========================================
+# Microchip / Atmel Studio
+*.atsuo
+*.user
+*.componentinfo.xml
+
+# Visual Studio Code
+.vscode/
+!.vscode/tasks.json
+!.vscode/launch.json
+
+# Visual Studio / CLion
+.vs/
+.idea/
+*.sln
+*.vcxproj
+
+# ==========================================
+# Operating System Files
+# ==========================================
+.DS_Store
+Thumbs.db
