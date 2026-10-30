@@ -1,30 +1,22 @@
 #include <iostream>
 #include "Event.h"
-#include "RingBuffer.h"
-#include "EventQueue.h"
-#include "HashTable.h"
+#include "SensorGenerator.h"
 
 int main() {
     std::cout << "==================================================" << std::endl;
-    std::cout << "   IoT Event Management System - Driver Skeleton  " << std::endl;
+    std::cout << "   IoT Event Management System - Generator Test   " << std::endl;
     std::cout << "==================================================" << std::endl;
 
-    // 1. Khởi tạo một dữ liệu sự kiện mẫu để test
-    IoTEvent test_event{
-        "DEV_TEMP_001",
-        1700000000,
-        1,
-        45.2f,
-        EventSeverity::CRITICAL
-    };
+    SensorGenerator generator;
 
-    // 2. In thông số kiểm tra
-    std::cout << "[SUCCESS] Build pipeline setup is working!" << std::endl;
-    std::cout << "[DATA TEST] Device ID : " << test_event.device_id << std::endl;
-    std::cout << "[DATA TEST] Sensor Val: " << test_event.value << " degC" << std::endl;
-    std::cout << "[DATA TEST] Severity  : " 
-              << (test_event.severity == EventSeverity::CRITICAL ? "CRITICAL" : "NORMAL") 
-              << std::endl;
+    for (int i = 1; i <= 5; ++i) {
+        IoTEvent ev = generator.generate_random_event();
+        std::cout << "Event #" << i 
+                  << " | Device: " << ev.device_id 
+                  << " | Val: " << ev.value 
+                  << " | Severity: " << static_cast<int>(ev.severity) 
+                  << std::endl;
+    }
 
     std::cout << "==================================================" << std::endl;
     return 0;
