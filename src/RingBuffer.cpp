@@ -1,5 +1,4 @@
-
-#include "RingBuffer.h"
+#include "../include/RingBuffer.h"
 #include <stdexcept>
 
 // Initialize Ring Buffer
