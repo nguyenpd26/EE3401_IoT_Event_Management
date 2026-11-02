@@ -1,15 +1,25 @@
+
 #include "RingBuffer.h"
-#include <mutex>
+#include <stdexcept>
 
 // Initialize Ring Buffer
-RingBuffer::RingBuffer() {
-    head = 0;
-    tail = 0;
-    count = 0;
+RingBuffer::RingBuffer(size_t capacity, OverflowPolicy policy)
+    : buffer(capacity),
+      capacity(capacity),
+      overflow_policy(policy),
+      head(0),
+      tail(0),
+      count(0),
+      total_packets_received(0),
+      dropped_packets(0),
+      overwritten_packets(0),
+      peak_buffer_usage(0) {
 
-    total_packets_received = 0;
-    dropped_packets = 0;
-    peak_buffer_usage = 0;
+    if (capacity == 0) {
+        throw std::invalid_argument(
+            "Ring Buffer capacity must be greater than zero"
+        );
+    }
 }
 
 // Add an event
@@ -18,14 +28,28 @@ bool RingBuffer::push(const IoTEvent& event) {
 
     total_packets_received++;
 
-    if (count == CAPACITY) {
-        dropped_packets++;
-        return false;
+    if (count == capacity) {
+
+        // Drop the new event
+        if (overflow_policy == OverflowPolicy::DropNew) {
+            dropped_packets++;
+            return false;
+        }
+
+        // Overwrite the oldest event
+        buffer[head] = event;
+
+        head = (head + 1) % capacity;
+        tail = (tail + 1) % capacity;
+
+        overwritten_packets++;
+
+        return true;
     }
 
     buffer[head] = event;
 
-    head = (head + 1) % CAPACITY;
+    head = (head + 1) % capacity;
     count++;
 
     if (count > peak_buffer_usage) {
@@ -45,7 +69,7 @@ bool RingBuffer::pop(IoTEvent& event) {
 
     event = buffer[tail];
 
-    tail = (tail + 1) % CAPACITY;
+    tail = (tail + 1) % capacity;
     count--;
 
     return true;
@@ -54,7 +78,7 @@ bool RingBuffer::pop(IoTEvent& event) {
 // Check if buffer is full
 bool RingBuffer::is_full() const {
     std::lock_guard<std::mutex> lock(mutex);
-    return count == CAPACITY;
+    return count == capacity;
 }
 
 // Check if buffer is empty
@@ -63,7 +87,7 @@ bool RingBuffer::is_empty() const {
     return count == 0;
 }
 
-// Get number of events
+// Get current number of events
 size_t RingBuffer::get_count() const {
     std::lock_guard<std::mutex> lock(mutex);
     return count;
@@ -71,7 +95,7 @@ size_t RingBuffer::get_count() const {
 
 // Get maximum buffer capacity
 size_t RingBuffer::get_capacity() const {
-    return CAPACITY;
+    return capacity;
 }
 
 // Get total received packets
@@ -80,10 +104,22 @@ uint64_t RingBuffer::get_total_packets_received() const {
     return total_packets_received;
 }
 
-// Get dropped packets
+// Get rejected new packets
 uint64_t RingBuffer::get_dropped_packets() const {
     std::lock_guard<std::mutex> lock(mutex);
     return dropped_packets;
+}
+
+// Get overwritten old packets
+uint64_t RingBuffer::get_overwritten_packets() const {
+    std::lock_guard<std::mutex> lock(mutex);
+    return overwritten_packets;
+}
+
+// Get total packets lost
+uint64_t RingBuffer::get_lost_packets() const {
+    std::lock_guard<std::mutex> lock(mutex);
+    return dropped_packets + overwritten_packets;
 }
 
 // Get peak buffer usage

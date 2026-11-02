@@ -5,13 +5,20 @@
 #include <cstdint>
 #include <cstddef>
 #include <mutex>
+#include <vector>
 #include "Event.h"
+
+enum class OverflowPolicy {
+    DropNew,
+    OverwriteOldest
+};
 
 class RingBuffer {
 private:
-    static const size_t CAPACITY = 16;
+    std::vector<IoTEvent> buffer;
 
-    IoTEvent buffer[CAPACITY];
+    const size_t capacity;
+    const OverflowPolicy overflow_policy;
 
     size_t head;
     size_t tail;
@@ -19,13 +26,16 @@ private:
 
     uint64_t total_packets_received;
     uint64_t dropped_packets;
+    uint64_t overwritten_packets;
     size_t peak_buffer_usage;
 
-    // Mutex for thread synchronization
     mutable std::mutex mutex;
 
 public:
-    RingBuffer();
+    explicit RingBuffer(
+        size_t capacity = 16,
+        OverflowPolicy policy = OverflowPolicy::DropNew
+    );
 
     bool push(const IoTEvent& event);
     bool pop(IoTEvent& event);
@@ -38,6 +48,9 @@ public:
 
     uint64_t get_total_packets_received() const;
     uint64_t get_dropped_packets() const;
+    uint64_t get_overwritten_packets() const;
+    uint64_t get_lost_packets() const;
+
     size_t get_peak_buffer_usage() const;
 };
 
