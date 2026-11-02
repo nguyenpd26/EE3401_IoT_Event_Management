@@ -1,0 +1,28 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "shell",
+            "label": "Build C++ Project",
+            "command": "g++",
+            "args": [
+                "-std=c++17",
+                "-g",
+                "-I${workspaceFolder}/include",
+                "${workspaceFolder}/src/*.cpp",
+                "-o",
+                "${workspaceFolder}/iot_system.exe"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}

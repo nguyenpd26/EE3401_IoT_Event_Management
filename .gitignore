@@ -28,9 +28,9 @@ Release/
 *.componentinfo.xml
 
 # Visual Studio Code
-.vscode/
-!.vscode/tasks.json
-!.vscode/launch.json
+# Ignore local workspace temp files, but allow tracking of all shared team JSON configs
+.vscode/*
+!.vscode/*.json
 
 # Visual Studio / CLion
 .vs/
