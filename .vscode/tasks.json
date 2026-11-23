@@ -2,14 +2,20 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "type": "shell",
-            "label": "Build C++ Project",
+            "type": "cppbuild",
+            "label": "Build IoT Event Management System",
             "command": "g++",
             "args": [
                 "-std=c++17",
+                "-Wall",
+                "-Wextra",
                 "-g",
                 "-I${workspaceFolder}/include",
-                "${workspaceFolder}/src/*.cpp",
+                "${workspaceFolder}/src/main.cpp",
+                "${workspaceFolder}/src/SensorGenerator.cpp",
+                "${workspaceFolder}/src/RingBuffer.cpp",
+                "${workspaceFolder}/src/EventQueue.cpp",
+                "${workspaceFolder}/src/HashTable.cpp",
                 "-o",
                 "${workspaceFolder}/iot_system.exe"
             ],
